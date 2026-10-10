@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://cloudguard-enterprise-1.onrender.com';
+
 export default function App() {
   const [portalMode, setPortalMode] = useState('select'); // 'select', 'admin-login', 'client-login', 'register', 'dashboard'
   const [token, setToken] = useState(localStorage.getItem('cloudguard_token') || '');
@@ -7,7 +9,7 @@ export default function App() {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Added show/hide state
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function App() {
 
   const fetchScanResults = async (targetWorkspace, activeToken) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/admin/scan-results?workspace=${targetWorkspace}`, {
+      const res = await fetch(`${API_BASE}/api/v1/admin/scan-results?workspace=${targetWorkspace}`, {
         headers: { 'Authorization': `Bearer ${activeToken}` }
       });
       const data = await res.json();
@@ -51,8 +53,8 @@ export default function App() {
     setIsLoading(true);
 
     const endpoint = roleType === 'admin' 
-      ? 'http://localhost:8000/api/v1/auth/admin-login' 
-      : 'http://localhost:8000/api/v1/auth/client-login';
+      ? `${API_BASE}/api/v1/auth/admin-login` 
+      : `${API_BASE}/api/v1/auth/client-login`;
 
     try {
       const response = await fetch(endpoint, {
@@ -71,7 +73,6 @@ export default function App() {
         if (data.workspace) setWorkspace(data.workspace);
         setPortalMode('dashboard');
       } else {
-        // Enforce exact requested error message on failure
         setErrorMsg('Incorrect password or email');
       }
     } catch (err) {
@@ -88,7 +89,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/register', {
+      const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, role: 'admin' })
@@ -121,7 +122,7 @@ export default function App() {
   const handleWorkspaceChange = async (newWorkspace) => {
     setWorkspace(newWorkspace);
     try {
-      await fetch('http://localhost:8000/api/v1/workspaces/switch', {
+      await fetch(`${API_BASE}/api/v1/workspaces/switch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ workspace: newWorkspace })
@@ -144,7 +145,7 @@ export default function App() {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/cloud/ingest', {
+      const response = await fetch(`${API_BASE}/api/v1/cloud/ingest`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
