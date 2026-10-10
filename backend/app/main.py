@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends, Header, UploadFile, File, Form, status
 from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows requests from any frontend origin including Vercel
+    allow_origins=["*"],  # Allows requests from your Vercel frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
