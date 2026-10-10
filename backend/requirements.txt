@@ -2,6 +2,7 @@ fastapi
 uvicorn
 sqlalchemy[asyncio]
 asyncpg
+psycopg[binary]
 passlib
 bcrypt==4.0.1
 python-jose
